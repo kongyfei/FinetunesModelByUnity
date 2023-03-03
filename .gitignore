@@ -1,0 +1,8 @@
+/FinetunesModel/Library/
+/FinetunesModel/Logs/
+/FinetunesModel/Packages/
+/FinetunesModel/ProjectSettings/
+/FinetunesModel/Temp/
+/FinetunesModel/UserSettings/
+.vsconfig
+FinetunesModel.sln
