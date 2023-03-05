@@ -6,3 +6,6 @@
 /FinetunesModel/UserSettings/
 .vsconfig
 FinetunesModel.sln
+FinetunesModel/Assembly-CSharp.csproj
+FinetunesModel/.vs/FinetunesModel/v16/.suo
+FinetunesModel/obj
