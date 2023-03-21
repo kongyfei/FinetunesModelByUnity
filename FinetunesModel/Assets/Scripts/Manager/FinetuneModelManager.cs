@@ -49,12 +49,12 @@ public class FinetuneModelManager : MonoBehaviour
 
     public void Fail(string content)
     {
-        Tool.DebugExtension.LogFail(content);
+        //Debug.LogFail(content);
     }
 
     public void Success(string content)
     {
-        Tool.DebugExtension.LogSuccess("成功");
+        //Tool.DebugExtension.LogSuccess("成功");
         Debug.Log(content);
     }
 }

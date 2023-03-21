@@ -11,7 +11,7 @@ public class FinetuneModel_OpenAI : FinetuneModelBase
 {
     private const string FILE_URL = "https://api.openai.com/v1/files";
     private const string FINETUNE_URL = "https://api.openai.com/v1/fine-tunes";
-    private const string APL_KEY = "";
+    private const string APL_KEY = "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";
     public TrainFileList trainFileList;
     public FinetuneModelList finetuneModelList;
 
@@ -53,7 +53,7 @@ public class FinetuneModel_OpenAI : FinetuneModelBase
     private void GetFileListSuccess(string content)
     {
         trainFileList = JsonMapper.ToObject<TrainFileList>(content);
-        Tool.DebugExtension.LogSuccess("成功获取文件列表:\n");
+        //Tool.DebugExtension.LogSuccess("成功获取文件列表:\n");
         Debug.Log(trainFileList.ToString());
     }
 
@@ -66,7 +66,7 @@ public class FinetuneModel_OpenAI : FinetuneModelBase
     private void GetFinetuneModelListSuccess(string content)
     {
         finetuneModelList = JsonMapper.ToObject<FinetuneModelList>(content);
-        Tool.DebugExtension.LogSuccess("成功获取微调模型列表:\n");
+        //Tool.DebugExtension.LogSuccess("成功获取微调模型列表:\n");
         Debug.Log(finetuneModelList.ToString());
     }
 

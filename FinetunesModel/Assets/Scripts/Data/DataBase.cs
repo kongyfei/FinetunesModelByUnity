@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tool
+/// <summary>
+/// 数据基类
+/// </summary>
+public class DataBase
 {
+
 }
