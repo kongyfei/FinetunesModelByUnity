@@ -18,4 +18,30 @@ MonoBehaviour:
     method: GET
     heads: []
     fields: []
-    data: 
+    datas: []
+  - id: 2
+    url: http://121.36.70.41:8088/v1/getAllModels
+    method: POST
+    heads: []
+    fields: []
+    datas:
+    - key: company
+      value: 
+  - id: 3
+    url: http://121.36.70.41:8088/v1/getParams
+    method: POST
+    heads: []
+    fields: []
+    datas:
+    - key: company_name
+      value: 
+  - id: 4
+    url: http://121.36.70.41:8088/v1/getParamInfo
+    method: POST
+    heads: []
+    fields: []
+    datas:
+    - key: company_name
+      value: 
+    - key: url_name
+      value: 

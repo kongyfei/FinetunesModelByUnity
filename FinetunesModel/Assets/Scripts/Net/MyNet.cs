@@ -33,14 +33,9 @@ public class MyNet : MonoBehaviour
     /// <param name="datas">传递数据</param>
     /// <param name="successHandle">访问成功处理</param>
     /// <param name="failHandle">访问失败处理</param>
-    public void StartAsycnNet(string url, string method, Dictionary<string, string> paras, byte[] datas, Action<object> successHandle, Action<string> failHandle)
-    {
-        StartCoroutine(AsycnNet(url, method, paras, datas, successHandle, failHandle));
-    }
-
-    //public void StartAsycnNet(MyUrlData data, Action<object> successHandle, Action<string> failHandle)
+    //public void StartAsycnNet(MyUrlData urlData, Action<object> successHandle, Action<string> failHandle)
     //{
-    //    StartCoroutine(data.url, data.method, data.)
+    //    //StartCoroutine(AsycnNet());
     //}
 
     /// <summary>
@@ -52,44 +47,73 @@ public class MyNet : MonoBehaviour
     /// <param name="datas">传递数据</param>
     /// <param name="successHandle">访问成功处理</param>
     /// <param name="failHandle">访问失败处理</param>
-    private IEnumerator AsycnNet(string url, string method, Dictionary<string, string> heads, byte[] datas, Action<object> successHandle, Action<string> failHandle)
+    private IEnumerator AsycnNet(string url, string method, Dictionary<string, string> heads, WWWForm form, byte[] datas, Action<object> successHandle, Action<string> failHandle)
     {
-        using (var request = new UnityWebRequest(url, method))
+        UnityWebRequest request;
+        switch (method)
         {
-            if (datas != null)
+            case "GET":
+                request = new UnityWebRequest(url, method);
+                break;
+            case "POST":
+                if (form != null)
+                {
+                    request = UnityWebRequest.Post(url, form);
+                }
+                else
+                {
+                    request = new UnityWebRequest(url, method);
+                }
+                break;
+            default:
+                request = null;
+                break;
+        }
+        if (request != null)
+        {
+            using (request)
             {
-                request.uploadHandler = new UploadHandlerRaw(datas);
-            }
-            request.downloadHandler = new DownloadHandlerBuffer();
+                if (datas != null)
+                {
+                    request.uploadHandler = new UploadHandlerRaw(datas);
+                }
+                request.downloadHandler = new DownloadHandlerBuffer();
 
-            if (heads != null && heads.Count > 0)
-            {
-                foreach (var item in heads.Keys)
+                if (heads != null && heads.Count > 0)
                 {
-                    request.SetRequestHeader(item, heads[item]);
+                    foreach (var item in heads.Keys)
+                    {
+                        request.SetRequestHeader(item, heads[item]);
+                    }
                 }
-            }
 
-            yield return request.SendWebRequest();
-            if (request.result != UnityWebRequest.Result.Success)
-            {
-                //Tool.DebugExtension.LogFail("访问失败:");
-                Debug.Log(request.error);
-                if (failHandle != null)
+                LogExtension.LogSuccess("开始传输");
+
+                yield return request.SendWebRequest();
+                if (request.result != UnityWebRequest.Result.Success)
                 {
-                    failHandle(request.error);
+                    //Tool.DebugExtension.LogFail("访问失败:");
+                    Debug.Log(request.error);
+                    if (failHandle != null)
+                    {
+                        failHandle(request.error);
+                    }
+                }
+                else
+                {
+                    //Tool.DebugExtension.LogSuccess("访问成功:");
+                    string responseJson = request.downloadHandler.text;
+                    Debug.Log(responseJson);
+                    if (successHandle != null)
+                    {
+                        successHandle(responseJson);
+                    }
                 }
             }
-            else
-            {
-                //Tool.DebugExtension.LogSuccess("访问成功:");
-                string responseJson = request.downloadHandler.text;
-                Debug.Log(responseJson);
-                if (successHandle != null)
-                {
-                    successHandle(responseJson);
-                }
-            }
+        }
+        else
+        {
+            LogExtension.LogFail("未正确设置网络");
         }
     }
 }

@@ -31,6 +31,6 @@ public class MyNetTest : MonoBehaviour
             paras.Add(paras_key[i], paras_value[i]);
         }
 
-        MyNet.instance.StartAsycnNet(url, method, paras, MyConvert.JsonToBytes(json), null, null);
+        //MyNet.instance.StartAsycnNet(url, method, paras, MyConvert.JsonToBytes(json), null, null);
     }
 }
