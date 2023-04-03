@@ -4,6 +4,8 @@ using UnityEngine;
 using System;
 using System.Text.RegularExpressions;
 using LitJson;
+using System.Text;
+using System.IO;
 
 namespace LocalData
 {
@@ -30,7 +32,14 @@ namespace LocalData
         public List<UrlField> fields;
         [Header("数据格式")]
         [SerializeField]
-        public List<UrlData> datas;
+        public UrlDatas datas;
+
+        public LocalUrlData(int size1, int size2, int size3)
+        {
+            heads = new List<UrlHead>(size1);
+            fields = new List<UrlField>(size2);
+            datas = new UrlDatas(size3);
+        }
 
         /// <summary>
         /// 设置url的head
@@ -73,7 +82,7 @@ namespace LocalData
         /// <param name="type">数据类型</param>
         /// <param name="value">值</param>
         /// <param name="values">参数值</param>
-        public void SetField(string key, FieldType type = FieldType.None, object value = null, params object[] values)
+        public void SetField(string key, FieldType type = FieldType.None, string value = null, string contentType = null, string contentName = null, params object[] values)
         {
             UrlField field = GetTheKeyValue(fields, key);
 
@@ -98,9 +107,9 @@ namespace LocalData
             switch (field.type)
             {
                 case FieldType.String:
-                    if (!string.IsNullOrEmpty((string)value))
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        string stringValue = (string)value;
+                        string stringValue = value;
                         field.stringValue = stringValue;
                     }
                     else if (string.IsNullOrEmpty(field.stringValue) && values.Length > 0)
@@ -116,22 +125,30 @@ namespace LocalData
                     }
                     break;
                 case FieldType.Text:
-                    if (value != null)
-                    {
-                        TextAsset text = (TextAsset)value;
-                        field.textValue = text;
-                    }
-                    break;
                 case FieldType.Sprite:
-                    if (value != null)
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        Sprite sprite = (Sprite)value;
-                        field.spriteValue = sprite;
+                        field.stringValue = value;
+                    }
+
+                    if (!string.IsNullOrEmpty(contentType))
+                    {
+                        field.contentType = contentType;
+                    }
+
+                    if (!string.IsNullOrEmpty(contentName))
+                    {
+                        field.contentName = contentName;
                     }
                     break;
                 default:
                     return;
             }
+        }
+
+        public void SetDataType(string type)
+        {
+            datas.type = type;
         }
 
         /// <summary>
@@ -142,13 +159,13 @@ namespace LocalData
         /// <param name="values">参数</param>
         public void SetData(string key, string formatValue = null, params object[] values)
         {
-            UrlData data = GetTheKeyValue(datas, key);
+            UrlData data = GetTheKeyValue(datas.datas, key);
 
             if (data == null)
             {
                 UrlData addData = new UrlData();
                 addData.key = key;
-                datas.Add(addData);
+                datas.datas.Add(addData);
                 data = addData;
             }
 
@@ -166,6 +183,72 @@ namespace LocalData
             {
                 data.value = SetFormat(data.value, values);
             }
+        }
+
+        public Dictionary<string, string> GetHeads()
+        {
+            Dictionary<string, string> dicHeads = new Dictionary<string, string>();
+            for (int i = 0; i < heads.Count; i++)
+            {
+                dicHeads.Add(heads[i].key, heads[i].value);
+            }
+            return dicHeads;
+        }
+
+        public WWWForm GetFields()
+        {
+            WWWForm form = new WWWForm();
+            for (int i = 0; i < fields.Count; i++)
+            {
+                switch (fields[i].type)
+                {
+                    case FieldType.String:
+                        form.AddField(fields[i].key, fields[i].stringValue);
+                        break;
+                    case FieldType.Sprite:
+                        break;
+                    case FieldType.Text:
+                        //可优化：对于大文件采用异步读取
+                        string content = File.ReadAllText(fields[i].stringValue);
+                        byte[] bytes = Encoding.UTF8.GetBytes(content);
+                        string fileName = null;
+                        if (!string.IsNullOrEmpty(fields[i].contentName))
+                        {
+                            fileName = fields[i].contentName;
+                        }
+                        else
+                        {
+                            fileName = Path.GetFileName(fields[i].stringValue);
+                        }
+                        form.AddBinaryData(fields[i].key, bytes, fileName, fields[i].contentType);
+                        break;
+                }
+            }
+            return form;
+        }
+
+        public byte[] GetDatas()
+        {
+            byte[] byteDatas = null;
+            Dictionary<string, string> dicData = GetDicData();
+            switch (datas.type)
+            {
+                case "json":
+                    string jsonStr = JsonMapper.ToJson(dicData);
+                    byteDatas = Encoding.UTF8.GetBytes(jsonStr);
+                    break;
+            }
+            return byteDatas;
+        }
+
+        private Dictionary<string, string> GetDicData()
+        {
+            Dictionary<string, string> tempDatas = new Dictionary<string, string>();
+            for (int i = 0; i < datas.datas.Count; i++)
+            {
+                tempDatas.Add(datas.datas[i].key, datas.datas[i].value);
+            }
+            return tempDatas;
         }
 
         private string SetFormat(string content, params object[] values)
@@ -242,9 +325,11 @@ namespace LocalData
     public class UrlField : UrlProp
     {
         public FieldType type = FieldType.None;
+        //当字段类型为text，sprite时，存储文件路径
         public string stringValue;
-        public Sprite spriteValue;
-        public TextAsset textValue;
+
+        public string contentName;
+        public string contentType;
     }
 
     [Serializable]
@@ -260,5 +345,17 @@ namespace LocalData
     public class UrlData : UrlProp
     {
         public string value;
+    }
+
+    [Serializable]
+    public class UrlDatas
+    {
+        public List<UrlData> datas;
+        public string type;
+
+        public UrlDatas(int size)
+        {
+            datas = new List<UrlData>(size);
+        }
     }
 }

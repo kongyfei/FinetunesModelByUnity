@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using System;
+using LocalData;
 
 /// <summary>
 /// 网络通信模块
@@ -33,10 +34,10 @@ public class MyNet : MonoBehaviour
     /// <param name="datas">传递数据</param>
     /// <param name="successHandle">访问成功处理</param>
     /// <param name="failHandle">访问失败处理</param>
-    //public void StartAsycnNet(MyUrlData urlData, Action<object> successHandle, Action<string> failHandle)
-    //{
-    //    //StartCoroutine(AsycnNet());
-    //}
+    public void StartAsycnNet(LocalUrlData urlData, Action<object> successHandle, Action<string> failHandle)
+    {
+        AsycnNet(urlData.url, urlData.method, urlData.GetHeads(), urlData.GetFields(), urlData.GetDatas(), successHandle, failHandle);
+    }
 
     /// <summary>
     /// 网络异步通信
@@ -92,8 +93,7 @@ public class MyNet : MonoBehaviour
                 yield return request.SendWebRequest();
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    //Tool.DebugExtension.LogFail("访问失败:");
-                    Debug.Log(request.error);
+                    LogExtension.LogFail(request.error);
                     if (failHandle != null)
                     {
                         failHandle(request.error);
@@ -101,9 +101,8 @@ public class MyNet : MonoBehaviour
                 }
                 else
                 {
-                    //Tool.DebugExtension.LogSuccess("访问成功:");
                     string responseJson = request.downloadHandler.text;
-                    Debug.Log(responseJson);
+                    LogExtension.LogSuccess(responseJson);
                     if (successHandle != null)
                     {
                         successHandle(responseJson);
