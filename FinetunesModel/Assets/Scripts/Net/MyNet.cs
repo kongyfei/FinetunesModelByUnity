@@ -12,6 +12,12 @@ public class MyNet : MonoBehaviour
 {
     public static MyNet instance;
 
+    public int retry;
+    public float timeout;
+    public int redirectLimit;
+
+    private Queue<NetNode> netNodes;
+
     private void Awake()
     {
         if (instance == null)
@@ -23,6 +29,26 @@ public class MyNet : MonoBehaviour
             Destroy(this.gameObject);
         }
         DontDestroyOnLoad(this.gameObject);
+
+        netNodes = new Queue<NetNode>();
+    }
+
+    private void Update()
+    {
+
+    }
+
+    public void AddNode(LocalUrlData urlData, NetNodePriority priority = NetNodePriority.LineUp)
+    {
+        NetNode node = new NetNode(urlData, priority);
+        switch (node.priority)
+        {
+            case NetNodePriority.LineUp:
+                netNodes.Enqueue(node);
+                break;
+            //case NetNodePriority.RightNow:
+
+        }
     }
 
     /// <summary>
@@ -36,7 +62,7 @@ public class MyNet : MonoBehaviour
     /// <param name="failHandle">访问失败处理</param>
     public void StartAsycnNet(LocalUrlData urlData, Action<object> successHandle, Action<string> failHandle)
     {
-        AsycnNet(urlData.url, urlData.method, urlData.GetHeads(), urlData.GetFields(), urlData.GetDatas(), successHandle, failHandle);
+        StartCoroutine(AsycnNet(urlData.url, urlData.method, urlData.GetHeads(), urlData.GetFields(), urlData.GetDatas(), successHandle, failHandle));
     }
 
     /// <summary>
@@ -115,4 +141,44 @@ public class MyNet : MonoBehaviour
             LogExtension.LogFail("未正确设置网络");
         }
     }
+}
+
+/// <summary>
+/// 通信网络节点
+/// </summary>
+public class NetNode
+{
+    public int retry;
+    public LocalUrlData data;
+    public NetNodeState state = NetNodeState.None;
+    public NetNodePriority priority = NetNodePriority.LineUp;
+
+    public NetNode(LocalUrlData data, NetNodePriority priority)
+    {
+        retry = 0;
+        this.data = data;
+        this.priority = priority;
+    }
+}
+
+/// <summary>
+/// 节点状态
+/// </summary>
+public enum NetNodeState
+{
+    None,
+    Waiting,
+    Loading,
+    Retry,
+    Success,
+    Fail,
+}
+
+/// <summary>
+/// 节点优先级
+/// </summary>
+public enum NetNodePriority
+{
+    LineUp,
+    RightNow,
 }
