@@ -12,9 +12,12 @@ public class MyNet : MonoBehaviour
 {
     public static MyNet instance;
 
-    public int retry;
-    public float timeout;
-    public int redirectLimit;
+    [Header("重传次数")]
+    public int RETRY;
+    [Header("超时时间")]
+    public int TIMEOUT;
+    [Header("重定向次数")]
+    public int RL;
 
     private Queue<NetNode> netNodes;
 
@@ -38,17 +41,10 @@ public class MyNet : MonoBehaviour
 
     }
 
-    public void AddNode(LocalUrlData urlData, NetNodePriority priority = NetNodePriority.LineUp)
+    public void AddNode(LocalUrlData urlData, Action<SuccessResult> successHandle = null, Action<FailResult> failHandle = null)
     {
-        NetNode node = new NetNode(urlData, priority);
-        switch (node.priority)
-        {
-            case NetNodePriority.LineUp:
-                netNodes.Enqueue(node);
-                break;
-            //case NetNodePriority.RightNow:
-
-        }
+        NetNode node = new NetNode(urlData, successHandle, failHandle);
+        StartAsycnNet(node);
     }
 
     /// <summary>
@@ -60,9 +56,15 @@ public class MyNet : MonoBehaviour
     /// <param name="datas">传递数据</param>
     /// <param name="successHandle">访问成功处理</param>
     /// <param name="failHandle">访问失败处理</param>
-    public void StartAsycnNet(LocalUrlData urlData, Action<object> successHandle, Action<string> failHandle)
+    private void StartAsycnNet(NetNode node)
     {
-        StartCoroutine(AsycnNet(urlData.url, urlData.method, urlData.GetHeads(), urlData.GetFields(), urlData.GetDatas(), successHandle, failHandle));
+        LocalUrlData urlData = node.data;
+        StartCoroutine(AsycnNet(urlData.url, urlData.method, urlData.GetHeads(), urlData.GetFields(), urlData.GetDatas(), node.successHandle, node.failHandle));
+    }
+
+    private void Setting(UnityWebRequest request)
+    {
+        request.timeout = TIMEOUT;
     }
 
     /// <summary>
@@ -74,7 +76,7 @@ public class MyNet : MonoBehaviour
     /// <param name="datas">传递数据</param>
     /// <param name="successHandle">访问成功处理</param>
     /// <param name="failHandle">访问失败处理</param>
-    private IEnumerator AsycnNet(string url, string method, Dictionary<string, string> heads, WWWForm form, byte[] datas, Action<object> successHandle, Action<string> failHandle)
+    private IEnumerator AsycnNet(string url, string method, Dictionary<string, string> heads, WWWForm form, byte[] datas, Action<SuccessResult> successHandle, Action<FailResult> failHandle)
     {
         UnityWebRequest request;
         switch (method)
@@ -96,6 +98,9 @@ public class MyNet : MonoBehaviour
                 request = null;
                 break;
         }
+
+        Setting(request);
+
         if (request != null)
         {
             using (request)
@@ -119,10 +124,12 @@ public class MyNet : MonoBehaviour
                 yield return request.SendWebRequest();
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    LogExtension.LogFail(request.error);
+                    LogExtension.LogFail("错误代码：" + request.responseCode);
+                    LogExtension.LogFail("错误信息：" + request.error);
                     if (failHandle != null)
                     {
-                        failHandle(request.error);
+                        FailResult result = new FailResult(request.responseCode, request.error);
+                        failHandle(result);
                     }
                 }
                 else
@@ -131,7 +138,8 @@ public class MyNet : MonoBehaviour
                     LogExtension.LogSuccess(responseJson);
                     if (successHandle != null)
                     {
-                        successHandle(responseJson);
+                        SuccessResult result = new SuccessResult(request.responseCode, SuccessResultType.Text, responseJson);
+                        successHandle(result);
                     }
                 }
             }
@@ -152,12 +160,15 @@ public class NetNode
     public LocalUrlData data;
     public NetNodeState state = NetNodeState.None;
     public NetNodePriority priority = NetNodePriority.LineUp;
+    public Action<SuccessResult> successHandle;
+    public Action<FailResult> failHandle;
 
-    public NetNode(LocalUrlData data, NetNodePriority priority)
+    public NetNode(LocalUrlData data, Action<SuccessResult> successHandle = null, Action<FailResult> failHandle = null)
     {
         retry = 0;
         this.data = data;
-        this.priority = priority;
+        this.successHandle = successHandle;
+        this.failHandle = failHandle;
     }
 }
 
@@ -181,4 +192,51 @@ public enum NetNodePriority
 {
     LineUp,
     RightNow,
+}
+
+/// <summary>
+/// 自定义返回结果
+/// </summary>
+public class CustomResult
+{
+    public long responseCode;
+}
+
+/// <summary>
+/// 失败结果
+/// </summary>
+public class FailResult : CustomResult
+{
+    public string error;
+
+    public FailResult(long responseCode, string error)
+    {
+        base.responseCode = responseCode;
+        this.error = error;
+    }
+}
+
+/// <summary>
+/// 成功结果
+/// </summary>
+public class SuccessResult : CustomResult
+{
+    public SuccessResultType type;
+    public object result;
+
+    public SuccessResult(long responseCode, SuccessResultType type, object result)
+    {
+        base.responseCode = responseCode;
+        this.type = type;
+        this.result = result;
+    }
+}
+
+/// <summary>
+/// 成功请求结果类型
+/// </summary>
+public enum SuccessResultType
+{
+    Text,
+    Sprite,
 }

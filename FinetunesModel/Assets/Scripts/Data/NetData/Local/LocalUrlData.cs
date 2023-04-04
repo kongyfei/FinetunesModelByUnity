@@ -30,6 +30,7 @@ namespace LocalData
         [Header("响应字段")]
         [SerializeField]
         public List<UrlField> fields;
+        private WWWForm form;
         [Header("数据格式")]
         [SerializeField]
         public UrlDatas datas;
@@ -197,7 +198,12 @@ namespace LocalData
 
         public WWWForm GetFields()
         {
-            WWWForm form = new WWWForm();
+            if (form != null)
+            {
+                return form;
+            }
+
+            form = new WWWForm();
             for (int i = 0; i < fields.Count; i++)
             {
                 switch (fields[i].type)
