@@ -19,10 +19,7 @@ public class MyNet : MonoBehaviour
     [Header("重定向次数")]
     public int RL;
 
-    private int retryNode;
-
     private List<NetNode> netNodes;
-    private List<NetNode> retryNetNodes;
 
     private void Awake()
     {
@@ -37,7 +34,6 @@ public class MyNet : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
 
         netNodes = new List<NetNode>();
-        retryNetNodes = new List<NetNode>();
     }
 
     private void Update()

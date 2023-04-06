@@ -7,11 +7,5 @@ using UnityEngine;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    private MyDataPool pool;
 
-    private void Awake()
-    {
-        pool = new MyDataPool(10);
-        //MyNet.instance.StartAsycnNet(MyUrl.GET_ALL_COMPANYS, "GET", );
-    }
 }

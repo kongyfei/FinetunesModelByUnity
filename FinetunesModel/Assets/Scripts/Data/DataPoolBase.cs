@@ -6,6 +6,7 @@ using UnityEngine;
 /// 数据池基类
 /// 作用：管理数据
 /// </summary>
-public class DataPoolBase
+public abstract class DataPoolBase
 {
+    public abstract void Init();
 }
