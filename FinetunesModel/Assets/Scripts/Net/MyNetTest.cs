@@ -21,12 +21,12 @@ public class MyNetTest : MonoBehaviour
         // 获取 MyUrlDataSet 对象中的 myUrlDatas 列表
         List<LocalUrlData> urlDatas = myUrlDataSet.myUrlDatas;
 
-        //MyNet.instance.StartAsycnNet(urlDatas[0], (object result) =>
-        //{
-        //    LogExtension.LogSuccess("成功");
-        //}, (string result) =>
-        //{
-        //    LogExtension.LogFail("失败");
-        //});
+        MyNet.instance.AddNode(urlDatas[0], (SuccessResult result) =>
+        {
+            LogExtension.LogSuccess("成功");
+        }, (FailResult result) =>
+        {
+            LogExtension.LogFail("失败");
+        });
     }
 }

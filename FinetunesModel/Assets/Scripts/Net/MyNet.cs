@@ -19,7 +19,10 @@ public class MyNet : MonoBehaviour
     [Header("重定向次数")]
     public int RL;
 
-    private Queue<NetNode> netNodes;
+    private int retryNode;
+
+    private List<NetNode> netNodes;
+    private List<NetNode> retryNetNodes;
 
     private void Awake()
     {
@@ -33,38 +36,42 @@ public class MyNet : MonoBehaviour
         }
         DontDestroyOnLoad(this.gameObject);
 
-        netNodes = new Queue<NetNode>();
+        netNodes = new List<NetNode>();
+        retryNetNodes = new List<NetNode>();
     }
 
     private void Update()
     {
-
+        if (netNodes.Count > 0)
+        {
+            for (int i = 0; i < netNodes.Count; i++)
+            {
+                if (netNodes[i].state == NetNodeState.Retry)
+                {
+                    RetryNode(netNodes[i]);
+                }
+            }
+        }
     }
 
     public void AddNode(LocalUrlData urlData, Action<SuccessResult> successHandle = null, Action<FailResult> failHandle = null)
     {
         NetNode node = new NetNode(urlData, successHandle, failHandle);
-        StartAsycnNet(node);
+        netNodes.Add(node);
+        StartCoroutine(AsycnNet(node));
     }
 
-    /// <summary>
-    /// 网络异步通信接口
-    /// </summary>
-    /// <param name="url">地址</param>
-    /// <param name="method">方法</param>
-    /// <param name="paras">参数头</param>
-    /// <param name="datas">传递数据</param>
-    /// <param name="successHandle">访问成功处理</param>
-    /// <param name="failHandle">访问失败处理</param>
-    private void StartAsycnNet(NetNode node)
+    private void RetryNode(NetNode node)
     {
-        LocalUrlData urlData = node.data;
-        StartCoroutine(AsycnNet(urlData.url, urlData.method, urlData.GetHeads(), urlData.GetFields(), urlData.GetDatas(), node.successHandle, node.failHandle));
+        StartCoroutine(AsycnNet(node));
     }
 
     private void Setting(UnityWebRequest request)
     {
-        request.timeout = TIMEOUT;
+        if (TIMEOUT != 0)
+            request.timeout = TIMEOUT;
+        if (RL != 0)
+            request.redirectLimit = RL;
     }
 
     /// <summary>
@@ -76,8 +83,19 @@ public class MyNet : MonoBehaviour
     /// <param name="datas">传递数据</param>
     /// <param name="successHandle">访问成功处理</param>
     /// <param name="failHandle">访问失败处理</param>
-    private IEnumerator AsycnNet(string url, string method, Dictionary<string, string> heads, WWWForm form, byte[] datas, Action<SuccessResult> successHandle, Action<FailResult> failHandle)
+    private IEnumerator AsycnNet(NetNode node)
     {
+        LocalUrlData data = node.data;
+        string url = data.url;
+        string method = data.method;
+        Dictionary<string, string> heads = data.GetHeads();
+        WWWForm form = data.GetFields();
+        byte[] datas = data.GetDatas();
+        Action<SuccessResult> successHandle = node.successHandle;
+        Action<FailResult> failHandle = node.failHandle;
+
+        node.state = NetNodeState.Start;
+
         UnityWebRequest request;
         switch (method)
         {
@@ -121,21 +139,45 @@ public class MyNet : MonoBehaviour
 
                 LogExtension.LogSuccess("开始传输");
 
+                node.state = NetNodeState.Doing;
+
                 yield return request.SendWebRequest();
                 if (request.result != UnityWebRequest.Result.Success)
-                {
+                {   
                     LogExtension.LogFail("错误代码：" + request.responseCode);
                     LogExtension.LogFail("错误信息：" + request.error);
-                    if (failHandle != null)
+
+                    if (node.retry >= RETRY)
                     {
-                        FailResult result = new FailResult(request.responseCode, request.error);
-                        failHandle(result);
+                        node.state = NetNodeState.Fail;
+                        if (netNodes.Contains(node))
+                        {
+                            netNodes.Remove(node);
+                        }
+
+                        if (failHandle != null)
+                        {
+                            FailResult result = new FailResult(request.responseCode, request.error);
+                            failHandle(result);
+                        }
+                    }
+                    else
+                    {
+                        node.retry++;
+                        node.state = NetNodeState.Retry;
                     }
                 }
                 else
                 {
                     string responseJson = request.downloadHandler.text;
                     LogExtension.LogSuccess(responseJson);
+
+                    node.state = NetNodeState.Success;
+                    if (netNodes.Contains(node))
+                    {
+                        netNodes.Remove(node);
+                    }
+
                     if (successHandle != null)
                     {
                         SuccessResult result = new SuccessResult(request.responseCode, SuccessResultType.Text, responseJson);
@@ -178,11 +220,12 @@ public class NetNode
 public enum NetNodeState
 {
     None,
-    Waiting,
-    Loading,
-    Retry,
-    Success,
-    Fail,
+    Waiting, //等待
+    Start, //开始
+    Doing, //进行中
+    Success, //成功
+    Fail, //失败
+    Retry, //重试
 }
 
 /// <summary>
