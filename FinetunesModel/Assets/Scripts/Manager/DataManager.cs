@@ -2,36 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Reflection;
+using System;
 
 /// <summary>
 /// 数据管理器
 /// </summary>
-public class DataManager : MonoBehaviour
-{
-    public DataManager instance;
-
+public class DataManager : MonoSingleton<DataManager>
+{ 
     public Dictionary<DataCategory, DataPoolBase> pools;
-
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
-        DontDestroyOnLoad(this.gameObject);
-    }
 
     private void Start()
     {
-    }
-
-    private void Init()
-    {
-        LocalDataPool localDataPool = new LocalDataPool();
+        pools.Add(DataCategory.LocalData, LocalDataPool.Instance);
+        pools.Add(DataCategory.LocalUrlData, LocalUrlDataPool.Instance);
+        //pools.Add(DataCategory.LocalData, LocalDataPool.Instance);
+        //pools.Add(DataCategory.LocalData, LocalDataPool.Instance);
     }
 }
 

@@ -9,4 +9,6 @@ using UnityEngine;
 public abstract class DataPoolBase
 {
     public abstract void Init();
+
+
 }
