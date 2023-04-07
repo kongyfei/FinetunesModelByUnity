@@ -5,7 +5,19 @@ using UnityEngine;
 /// <summary>
 /// 面板管理类
 /// </summary>
-public class PanelManager : MonoBehaviour
+public class PanelManager : MonoSingleton<PanelManager>
 {
+    private Stack<PanelBase> panels;
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+        panels = new Stack<PanelBase>();
+    }
+
+    public void Show<T>()
+    {
+        
+    }
 }
