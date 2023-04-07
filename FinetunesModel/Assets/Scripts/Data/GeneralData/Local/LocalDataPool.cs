@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LocalData;
+using LitJson;
 
 /// <summary>
 /// 本地数据池
@@ -28,7 +29,15 @@ public class LocalDataPool : DataPoolBase
         }
     }
 
+    public Dictionary<string, string> token;
+
     public override void Init()
     {
+
+    }
+
+    public override void Save()
+    {
+
     }
 }

@@ -10,5 +10,5 @@ public abstract class DataPoolBase
 {
     public abstract void Init();
 
-
+    public abstract void Save();
 }

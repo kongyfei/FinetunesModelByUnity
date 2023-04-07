@@ -19,6 +19,19 @@ public class DataManager : MonoSingleton<DataManager>
         //pools.Add(DataCategory.LocalData, LocalDataPool.Instance);
         //pools.Add(DataCategory.LocalData, LocalDataPool.Instance);
     }
+
+    private void OnDestroy()
+    {
+        Save();
+    }
+
+    private void Save()
+    {
+        foreach (var item in pools.Keys)
+        {
+            pools[item].Save();
+        }
+    }
 }
 
 /// <summary>
