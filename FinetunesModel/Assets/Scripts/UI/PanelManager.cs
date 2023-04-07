@@ -17,7 +17,7 @@ public class PanelManager : MonoSingleton<PanelManager>
     }
 
     public void Show<T>()
-    {
-        
+    { 
+        string typeName = typeof(T).ToString();
     }
 }
