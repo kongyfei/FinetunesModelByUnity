@@ -10,11 +10,13 @@ using System;
 /// </summary>
 public class DataManager : MonoSingleton<DataManager>
 { 
-    public Dictionary<DataCategory, DataPoolBase> pools;
+    private Dictionary<DataCategory, DataPoolBase> pools;
 
     private void Start()
     {
-        pools.Add(DataCategory.LocalData, LocalDataPool.Instance);
+        pools = new Dictionary<DataCategory, DataPoolBase>();
+
+        //pools.Add(DataCategory.LocalData, LocalDataPool.Instance);
         pools.Add(DataCategory.LocalUrlData, LocalUrlDataPool.Instance);
         //pools.Add(DataCategory.LocalData, LocalDataPool.Instance);
         //pools.Add(DataCategory.LocalData, LocalDataPool.Instance);

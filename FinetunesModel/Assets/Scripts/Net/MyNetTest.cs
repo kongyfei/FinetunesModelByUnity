@@ -15,13 +15,7 @@ public class MyNetTest : MonoBehaviour
 
     public void Test()
     {
-        // 获取 MyUrlDataSet 对象的实例
-        MyUrlDataSet myUrlDataSet = Resources.Load<MyUrlDataSet>("MyUrlDataSet");
-
-        // 获取 MyUrlDataSet 对象中的 myUrlDatas 列表
-        List<LocalUrlData> urlDatas = myUrlDataSet.myUrlDatas;
-
-        MyNet.instance.AddNode(urlDatas[0], (SuccessResult result) =>
+        MyNet.instance.AddNode(LocalUrlDataPool.Instance.urlDatas[0], (SuccessResult result) =>
         {
             LogExtension.LogSuccess("成功");
         }, (FailResult result) =>

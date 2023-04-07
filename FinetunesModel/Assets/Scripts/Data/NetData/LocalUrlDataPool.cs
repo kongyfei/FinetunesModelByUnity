@@ -28,12 +28,19 @@ public class LocalUrlDataPool : DataPoolBase
         }
     }
 
+    public List<LocalUrlData> urlDatas;
+
     public override void Init()
     {
         // 获取 MyUrlDataSet 对象的实例
         MyUrlDataSet myUrlDataSet = Resources.Load<MyUrlDataSet>("MyUrlDataSet");
 
         // 获取 MyUrlDataSet 对象中的 myUrlDatas 列表
-        List<LocalUrlData> urlDatas = myUrlDataSet.myUrlDatas;
+        urlDatas = myUrlDataSet.myUrlDatas;
+    }
+
+    public override void Save()
+    {
+
     }
 }
