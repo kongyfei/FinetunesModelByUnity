@@ -7,8 +7,16 @@ using UnityEngine;
 /// </summary>
 public class PanelManager : MonoSingleton<PanelManager>
 {
+    /// <summary>
+    /// 管理界面的显示顺序
+    /// </summary>
     private Stack<PanelBase> panels;
+
+    /// <summary>
+    /// 缓存池优化
+    /// </summary>
     private Dictionary<string, GameObject> prefabPool;
+    private Dictionary<string, GameObject> panelPool;
 
     public Transform UIParent;
     public string rootPath;
@@ -16,31 +24,76 @@ public class PanelManager : MonoSingleton<PanelManager>
     protected override void Awake()
     {
         base.Awake();
-          
+
         panels = new Stack<PanelBase>();
         prefabPool = new Dictionary<string, GameObject>();
+        panelPool = new Dictionary<string, GameObject>();
     }
 
     public void Show<T>()
-    { 
+    {
         string typeName = typeof(T).ToString();
-        GameObject prefab;
-        if (!prefabPool.ContainsKey(typeName))
+
+        int popCount = 0;
+        foreach (var item in panels)
         {
-            string prefabPath = rootPath + typeName;
-            prefab = Resources.Load(prefabPath) as GameObject;
-            prefabPool.Add(typeName, prefab);
+            string name = item.gameObject.name;
+            if (name == typeName)
+            {
+                break;
+            }
+            popCount++;
+        }
+
+        PanelBase panelBase;
+        if (popCount > 0)
+        {
+            for (int i = 0; i < popCount; i++)
+            {
+                GameObject gameObject = panels.Pop().gameObject;
+                Destroy(gameObject);
+            }
+
+            panelBase = panels.Peek();
+            panelBase.gameObject.SetActive(true);
         }
         else
         {
-            prefab = prefabPool[typeName];
+            GameObject prefab;
+            if (!prefabPool.ContainsKey(typeName))
+            {
+                string prefabPath = rootPath + typeName;
+                prefab = Resources.Load(prefabPath) as GameObject;
+                prefabPool.Add(typeName, prefab);
+            }
+            else
+            {
+                prefab = prefabPool[typeName];
+            }
+
+            GameObject panel = Instantiate(prefab, UIParent, false);
+            panel.name = typeName;
+            panelBase = panel.GetComponent<PanelBase>();
+            panels.Push(panelBase);
+            panelBase.state = PanelState.Load;
         }
+        panelBase.OnInit();
+        panelBase.OnShow();
+        panelBase.state = PanelState.Show;
+    }
 
-        GameObject panel = Instantiate(prefab, Vector3.zero, Quaternion.identity, UIParent);
-        PanelBase panelBase = panel.GetComponent<PanelBase>();
-        panels.Push(panelBase);
-
-        panelBase.Init();
-        panelBase.Show();
+    public void Hide(PanelBase panelBase)
+    {
+        PanelBase curPanel = panels.Peek();
+        if (curPanel.gameObject.name == panelBase.gameObject.name)
+        {
+            panelBase.OnHide();
+            panels.Pop();
+            Destroy(panelBase.gameObject);
+        }
+        else
+        {
+            LogExtension.LogFail("面板顺序错误");
+        }
     }
 }
