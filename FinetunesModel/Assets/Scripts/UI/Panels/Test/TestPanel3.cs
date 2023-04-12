@@ -33,7 +33,7 @@ public class TestPanel3 : PanelBase
 
     private void Jump()
     {
-        PanelManager.Instance.Show<TestPanel2>();
+        PanelManager.Instance.Show<TestPanel4>();
     }
 
     public void Close()

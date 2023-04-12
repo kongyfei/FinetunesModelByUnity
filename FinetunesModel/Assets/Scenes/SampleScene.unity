@@ -1885,7 +1885,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIParent: {fileID: 1348073071}
-  rootPath: Prefab/
+  rootPath: Prefab/Test/
 --- !u!114 &1403180139
 MonoBehaviour:
   m_ObjectHideFlags: 0

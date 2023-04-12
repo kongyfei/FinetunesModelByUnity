@@ -21,6 +21,8 @@ public class PanelManager : MonoSingleton<PanelManager>
     public Transform UIParent;
     public string rootPath;
 
+    private List<PrefabAsset> prefabAssets;
+
     protected override void Awake()
     {
         base.Awake();
@@ -30,23 +32,38 @@ public class PanelManager : MonoSingleton<PanelManager>
         panelPool = new Dictionary<string, GameObject>();
     }
 
+    private void Start()
+    {
+        PrefabAssets tempPrefabAssets = Resources.Load<PrefabAssets>("Data/MyPrefabAssets");
+        prefabAssets = tempPrefabAssets.myPrefabAssets;
+    }
+
     public void Show<T>()
     {
         string typeName = typeof(T).ToString();
+        PrefabAsset curPanelAsset = GetPrefabAssetByName(typeName);
 
-        while (panels.Count > 0 && panels.Peek().type == PanelType.Popups)
+        if (curPanelAsset.type == PanelType.Interface)
         {
-            GameObject gameObject = panels.Pop().gameObject;
-            Destroy(gameObject);
-        }
+            while (panels.Count > 0 && panels.Peek().type == PanelType.Popups)
+            {
+                GameObject gameObject = panels.Pop().gameObject;
+                Destroy(gameObject);
+            }
 
-        if (panels.Count > 0)
+            if (panels.Count > 0)
+            {
+                PanelBase hidePanel = panels.Peek();
+                hidePanel.gameObject.SetActive(false);
+            }
+        }
+        else if (curPanelAsset.type == PanelType.Popups)
         {
             PanelBase hidePanel = panels.Peek();
-            hidePanel.gameObject.SetActive(false);
+            hidePanel.GetComponent<CanvasGroup>().blocksRaycasts = false;
         }
 
-            int popCount = 0;
+        int popCount = 0;
         bool isPop = false;
         foreach (var item in panels)
         {
@@ -92,6 +109,7 @@ public class PanelManager : MonoSingleton<PanelManager>
             panels.Push(panelBase);
             panelBase.state = PanelState.Load;
         }
+        panelBase.GetComponent<CanvasGroup>().blocksRaycasts = true;
         panelBase.OnInit();
         panelBase.OnShow();
         panelBase.state = PanelState.Show;
@@ -108,12 +126,28 @@ public class PanelManager : MonoSingleton<PanelManager>
 
             if (panels.Count > 0)
             {
-                panels.Peek().gameObject.SetActive(true);
+                PanelBase showPanel = panels.Peek();
+                showPanel.gameObject.SetActive(true);
+                showPanel.GetComponent<CanvasGroup>().blocksRaycasts = true;
             }
         }
         else
         {
-            LogExtension.LogFail("√Ê∞ÂÀ≥–Ú¥ÌŒÛ");
+            LogExtension.LogFail($"√Ê∞ÂÀ≥–Ú¥ÌŒÛ,’ª∂•√Ê∞Â£∫{curPanel.gameObject.name}£¨µ±«∞πÿ±’√Ê∞Â{panelBase.gameObject.name}");
         }
+    }
+
+    private PrefabAsset GetPrefabAssetByName(string name)
+    {
+        for (int i = 0; i < prefabAssets.Count; i++)
+        {
+            if (name == prefabAssets[i].name)
+            {
+                return prefabAssets[i];
+            }
+        }
+
+        LogExtension.LogFail($"≤ª¥Ê‘⁄{name}√Ê∞Â");
+        return null;
     }
 }

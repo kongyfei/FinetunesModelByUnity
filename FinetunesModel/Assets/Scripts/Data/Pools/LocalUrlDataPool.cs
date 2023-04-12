@@ -33,7 +33,7 @@ public class LocalUrlDataPool : DataPoolBase
     public override void Init()
     {
         // 获取 MyUrlDataSet 对象的实例
-        MyUrlDataSet myUrlDataSet = Resources.Load<MyUrlDataSet>("MyUrlDataSet");
+        MyUrlDataSet myUrlDataSet = Resources.Load<MyUrlDataSet>("Data/MyUrlDataSet");
 
         // 获取 MyUrlDataSet 对象中的 myUrlDatas 列表
         urlDatas = myUrlDataSet.myUrlDatas;
