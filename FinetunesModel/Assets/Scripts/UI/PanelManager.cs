@@ -34,19 +34,33 @@ public class PanelManager : MonoSingleton<PanelManager>
     {
         string typeName = typeof(T).ToString();
 
-        int popCount = 0;
+        while (panels.Count > 0 && panels.Peek().type == PanelType.Popups)
+        {
+            GameObject gameObject = panels.Pop().gameObject;
+            Destroy(gameObject);
+        }
+
+        if (panels.Count > 0)
+        {
+            PanelBase hidePanel = panels.Peek();
+            hidePanel.gameObject.SetActive(false);
+        }
+
+            int popCount = 0;
+        bool isPop = false;
         foreach (var item in panels)
         {
             string name = item.gameObject.name;
             if (name == typeName)
             {
+                isPop = true;
                 break;
             }
             popCount++;
         }
 
         PanelBase panelBase;
-        if (popCount > 0)
+        if (isPop)
         {
             for (int i = 0; i < popCount; i++)
             {
@@ -74,6 +88,7 @@ public class PanelManager : MonoSingleton<PanelManager>
             GameObject panel = Instantiate(prefab, UIParent, false);
             panel.name = typeName;
             panelBase = panel.GetComponent<PanelBase>();
+            panelBase.name = typeName;
             panels.Push(panelBase);
             panelBase.state = PanelState.Load;
         }
@@ -90,6 +105,11 @@ public class PanelManager : MonoSingleton<PanelManager>
             panelBase.OnHide();
             panels.Pop();
             Destroy(panelBase.gameObject);
+
+            if (panels.Count > 0)
+            {
+                panels.Peek().gameObject.SetActive(true);
+            }
         }
         else
         {

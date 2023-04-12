@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TestPanel : PanelBase
+public class TestPanel3 : PanelBase
 {
     public Button button;
     public Button button1;
@@ -31,9 +31,9 @@ public class TestPanel : PanelBase
         base.OnHide();
     }
 
-    public void Jump()
+    private void Jump()
     {
-        PanelManager.Instance.Show<TestPanel1>();
+        PanelManager.Instance.Show<TestPanel2>();
     }
 
     public void Close()
@@ -46,6 +46,6 @@ public class TestPanel : PanelBase
         Debug.Log("OnDisable");
 
         button.onClick.RemoveListener(Close);
-        button1.onClick.RemoveListener(Jump);
+        button1.onClick.AddListener(Jump);
     }
 }

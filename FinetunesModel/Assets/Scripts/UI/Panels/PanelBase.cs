@@ -10,6 +10,7 @@ public abstract class PanelBase : MonoBehaviour
     public PanelType type;
     public PanelState state;
     public UseFrequency frequency;
+    public string name;
 
     public virtual void OnInit()
     {
