@@ -32,4 +32,16 @@ public class MyConvert
     {
         return JsonMapper.ToJson(t);
     }
+
+    public static T ToText<T>(SuccessResult result) where T: new()
+    {
+        if (result.type == SuccessResultType.Text)
+        {
+            string text = (string)result.result;
+            return Serialize<T>(text);
+        }
+
+        LogExtension.LogFail("结果非文本，转化错误");
+        return default(T);
+    }
 }

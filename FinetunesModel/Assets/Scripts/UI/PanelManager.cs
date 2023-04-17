@@ -137,6 +137,24 @@ public class PanelManager : MonoSingleton<PanelManager>
         }
     }
 
+    public void ShowLoading()
+    {
+        Show<LoadingPanel>();
+    }
+
+    public void HideLoading()
+    {
+        PanelBase loading = panels.Peek();
+        if (loading.name == "LoadingPanel")
+        {
+            Hide(loading);
+        }
+        else
+        {
+            LogExtension.LogFail("加载中页面顺序显示错误");
+        }
+    }
+
     private PrefabAsset GetPrefabAssetByName(string name)
     {
         for (int i = 0; i < prefabAssets.Count; i++)

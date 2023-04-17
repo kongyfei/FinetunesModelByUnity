@@ -52,6 +52,19 @@ public class CompanyData
 }
 
 /// <summary>
+/// 公司数据列表
+/// </summary>
+public class CompanyDataList
+{
+    public List<CompanyData> companys;
+
+    public CompanyDataList()
+    {
+        companys = new List<CompanyData>();
+    }
+}
+
+/// <summary>
 /// 公司其他信息数据
 /// </summary>
 public class CompanyMessageData

@@ -23,3 +23,7 @@ MonoBehaviour:
     type: 1
   - name: TestPanel4
     type: 1
+  - name: CompanyShowPanel
+    type: 0
+  - name: LoadingPanel
+    type: 1

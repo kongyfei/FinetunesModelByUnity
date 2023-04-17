@@ -7,5 +7,7 @@ using LocalData;
 public class MyUrlDataSet : ScriptableObject
 {
     [SerializeField]
+    public string url;
+    [SerializeField]
     public List<LocalUrlData> myUrlDatas;
 }

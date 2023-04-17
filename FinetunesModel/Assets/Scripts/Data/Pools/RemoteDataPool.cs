@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LitJson;
+using LocalData;
+using System;
 
 public class RemoteDataPool : DataPoolBase
 {
@@ -25,7 +27,7 @@ public class RemoteDataPool : DataPoolBase
         }
     }
 
-    public List<CompanyData> companyDatas;
+    public CompanyDataList companys;
 
     public override void Init()
     {
@@ -35,5 +37,25 @@ public class RemoteDataPool : DataPoolBase
     public override void Save()
     {
 
+    }
+
+    /// <summary>
+    /// 加载公司数据
+    /// </summary>
+    public void LoadCompanyData(Action onComplete)
+    {
+        PanelManager.Instance.ShowLoading();
+        LocalUrlData data = LocalUrlDataPool.Instance.GetLocalUrlDataById(1);
+        MyNet.instance.AddNode(data, (result) => {
+            OnLoadCompanyDataSuccess(result);
+            PanelManager.Instance.HideLoading();
+            onComplete();
+        });
+    }
+
+    public void OnLoadCompanyDataSuccess(SuccessResult result)
+    {
+        companys = MyConvert.ToText<CompanyDataList>(result);
+        LocalDataPool.Instance.ToCompanyEntryData(companys);
     }
 }

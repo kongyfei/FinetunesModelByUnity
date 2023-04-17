@@ -37,10 +37,31 @@ public class LocalUrlDataPool : DataPoolBase
 
         // 获取 MyUrlDataSet 对象中的 myUrlDatas 列表
         urlDatas = myUrlDataSet.myUrlDatas;
+
+        string url = myUrlDataSet.url;
+
+        for (int i = 0; i < urlDatas.Count; i++)
+        {
+            urlDatas[i].url = url + urlDatas[i].url;
+        }
     }
 
     public override void Save()
     {
 
+    }
+
+    public LocalUrlData GetLocalUrlDataById(int id)
+    {
+        for (int i = 0; i < urlDatas.Count; i++)
+        {
+            if (urlDatas[i].id == id)
+            {
+                return urlDatas[i];
+            }
+        }
+
+        LogExtension.LogFail($"没有此{id}的localurldata");
+        return null;
     }
 }

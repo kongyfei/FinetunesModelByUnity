@@ -6,6 +6,10 @@ public class PanelTest : MonoBehaviour
 {
     public void Test()
     {
-        PanelManager.Instance.Show<TestPanel>();
+        RemoteDataPool.Instance.LoadCompanyData(
+            ()=>{
+                PanelManager.Instance.Show<CompanyShowPanel>();
+             }
+            );
     }
 }

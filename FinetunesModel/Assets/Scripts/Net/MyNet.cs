@@ -18,6 +18,8 @@ public class MyNet : MonoBehaviour
     public int TIMEOUT;
     [Header("重定向次数")]
     public int RL;
+    [Header("测试模式")]
+    public NetMode mode;
 
     private List<NetNode> netNodes;
 
@@ -92,99 +94,106 @@ public class MyNet : MonoBehaviour
 
         node.state = NetNodeState.Start;
 
-        UnityWebRequest request;
-        switch (method)
+        if (mode == NetMode.Release)
         {
-            case "GET":
-                request = new UnityWebRequest(url, method);
-                break;
-            case "POST":
-                if (form != null)
-                {
-                    request = UnityWebRequest.Post(url, form);
-                }
-                else
-                {
-                    request = new UnityWebRequest(url, method);
-                }
-                break;
-            default:
-                request = null;
-                break;
-        }
-
-        Setting(request);
-
-        if (request != null)
-        {
-            using (request)
+            UnityWebRequest request;
+            switch (method)
             {
-                if (datas != null)
-                {
-                    request.uploadHandler = new UploadHandlerRaw(datas);
-                }
-                request.downloadHandler = new DownloadHandlerBuffer();
-
-                if (heads != null && heads.Count > 0)
-                {
-                    foreach (var item in heads.Keys)
+                case "GET":
+                    request = new UnityWebRequest(url, method);
+                    break;
+                case "POST":
+                    if (form != null)
                     {
-                        request.SetRequestHeader(item, heads[item]);
+                        request = UnityWebRequest.Post(url, form);
                     }
-                }
-
-                LogExtension.LogSuccess("开始传输");
-
-                node.state = NetNodeState.Doing;
-
-                yield return request.SendWebRequest();
-                if (request.result != UnityWebRequest.Result.Success)
-                {   
-                    LogExtension.LogFail("错误代码：" + request.responseCode);
-                    LogExtension.LogFail("错误信息：" + request.error);
-
-                    if (node.retry >= RETRY)
+                    else
                     {
-                        node.state = NetNodeState.Fail;
+                        request = new UnityWebRequest(url, method);
+                    }
+                    break;
+                default:
+                    request = null;
+                    break;
+            }
+
+            Setting(request);
+
+            if (request != null)
+            {
+                using (request)
+                {
+                    if (datas != null)
+                    {
+                        request.uploadHandler = new UploadHandlerRaw(datas);
+                    }
+                    request.downloadHandler = new DownloadHandlerBuffer();
+
+                    if (heads != null && heads.Count > 0)
+                    {
+                        foreach (var item in heads.Keys)
+                        {
+                            request.SetRequestHeader(item, heads[item]);
+                        }
+                    }
+
+                    LogExtension.LogSuccess("开始传输");
+
+                    node.state = NetNodeState.Doing;
+
+                    yield return request.SendWebRequest();
+                    if (request.result != UnityWebRequest.Result.Success)
+                    {
+                        LogExtension.LogFail("错误代码：" + request.responseCode);
+                        LogExtension.LogFail("错误信息：" + request.error);
+
+                        if (node.retry >= RETRY)
+                        {
+                            node.state = NetNodeState.Fail;
+                            if (netNodes.Contains(node))
+                            {
+                                netNodes.Remove(node);
+                            }
+
+                            if (failHandle != null)
+                            {
+                                FailResult result = new FailResult(request.responseCode, request.error);
+                                failHandle(result);
+                            }
+                        }
+                        else
+                        {
+                            node.retry++;
+                            node.state = NetNodeState.Retry;
+                        }
+                    }
+                    else
+                    {
+                        string responseJson = request.downloadHandler.text;
+                        LogExtension.LogSuccess(responseJson);
+
+                        node.state = NetNodeState.Success;
                         if (netNodes.Contains(node))
                         {
                             netNodes.Remove(node);
                         }
 
-                        if (failHandle != null)
+                        if (successHandle != null)
                         {
-                            FailResult result = new FailResult(request.responseCode, request.error);
-                            failHandle(result);
+                            SuccessResult result = new SuccessResult(request.responseCode, SuccessResultType.Text, responseJson);
+                            successHandle(result);
                         }
                     }
-                    else
-                    {
-                        node.retry++;
-                        node.state = NetNodeState.Retry;
-                    }
                 }
-                else
-                {
-                    string responseJson = request.downloadHandler.text;
-                    LogExtension.LogSuccess(responseJson);
-
-                    node.state = NetNodeState.Success;
-                    if (netNodes.Contains(node))
-                    {
-                        netNodes.Remove(node);
-                    }
-
-                    if (successHandle != null)
-                    {
-                        SuccessResult result = new SuccessResult(request.responseCode, SuccessResultType.Text, responseJson);
-                        successHandle(result);
-                    }
-                }
+            }
+            else
+            {
+                LogExtension.LogFail("未正确设置网络");
             }
         }
         else
         {
-            LogExtension.LogFail("未正确设置网络");
+            
         }
     }
 }
@@ -278,4 +287,10 @@ public enum SuccessResultType
 {
     Text,
     Sprite,
+}
+
+public enum NetMode
+{
+    Release,
+    Test,
 }

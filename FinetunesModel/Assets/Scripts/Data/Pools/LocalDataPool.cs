@@ -30,14 +30,24 @@ public class LocalDataPool : DataPoolBase
     }
 
     public Dictionary<string, string> token;
+    public List<CompanyEntryData> companyEntryDatas;
 
     public override void Init()
     {
-
+        companyEntryDatas = new List<CompanyEntryData>(10);
     }
 
     public override void Save()
     {
 
+    }
+
+    public void ToCompanyEntryData(CompanyDataList list)
+    {
+        List<CompanyData> companyDatas = list.companys;
+        for (int i = 0; i < companyDatas.Count; i++)
+        {
+            companyEntryDatas.Add(new CompanyEntryData(companyDatas[i].name));
+        }
     }
 }

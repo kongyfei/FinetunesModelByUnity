@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5eef91d1253ad14ca7affcfa8e7d3d9, type: 3}
   m_Name: MyUrlDataSet
   m_EditorClassIdentifier: 
+  url: http://121.36.70.41:8088/v1/
   myUrlDatas:
   - id: 1
-    url: http://121.36.70.41:8088/v1/getAllCompany
+    url: getAllCompany
     method: GET
     heads: []
     fields: []
@@ -22,7 +23,7 @@ MonoBehaviour:
       datas: []
       type: 
   - id: 2
-    url: http://121.36.70.41:8088/v1/getAllModels
+    url: getAllModels
     method: POST
     heads: []
     fields: []
@@ -32,7 +33,7 @@ MonoBehaviour:
         value: 
       type: json
   - id: 3
-    url: http://121.36.70.41:8088/v1/getParams
+    url: getParams
     method: POST
     heads: []
     fields: []
@@ -42,7 +43,7 @@ MonoBehaviour:
         value: 
       type: json
   - id: 4
-    url: http://121.36.70.41:8088/v1/getParamInfo
+    url: getParamInfo
     method: POST
     heads: []
     fields: []
