@@ -184,7 +184,7 @@ MonoBehaviour:
   state: 0
   frequency: 0
   name: 
-  loadingIcon: {fileID: 0}
+  loadingIcon: {fileID: 4591649953031307221}
   rotateSpeed: 100
 --- !u!1 &6680784901320286301
 GameObject:

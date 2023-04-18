@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System;
 using LocalData;
+using LitJson;
 
 /// <summary>
 /// 网络通信模块
@@ -20,6 +21,7 @@ public class MyNet : MonoBehaviour
     public int RL;
     [Header("测试模式")]
     public NetMode mode;
+    public float delayTime;
 
     private List<NetNode> netNodes;
 
@@ -193,7 +195,11 @@ public class MyNet : MonoBehaviour
         }
         else
         {
-            
+            yield return new WaitForSeconds(delayTime);
+            TestData list = Resources.Load<TestData>("Data/RemoteTestData");
+            CompanyDataList companys = list.companys;
+            SuccessResult result = new SuccessResult(1, SuccessResultType.Text, JsonMapper.ToJson(companys));
+            successHandle(result);
         }
     }
 }

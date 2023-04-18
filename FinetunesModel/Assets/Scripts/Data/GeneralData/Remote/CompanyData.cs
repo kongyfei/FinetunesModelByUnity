@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 /// <summary>
 /// 公司信息数据
 /// </summary>
+[Serializable]
 public class CompanyData
 {
     public int id;
@@ -54,6 +56,7 @@ public class CompanyData
 /// <summary>
 /// 公司数据列表
 /// </summary>
+[Serializable]
 public class CompanyDataList
 {
     public List<CompanyData> companys;
@@ -67,6 +70,7 @@ public class CompanyDataList
 /// <summary>
 /// 公司其他信息数据
 /// </summary>
+[Serializable]
 public class CompanyMessageData
 {
     
@@ -75,6 +79,7 @@ public class CompanyMessageData
 /// <summary>
 /// 模型数据
 /// </summary>
+[Serializable]
 public class ModelData
 {
     public int id;
@@ -99,6 +104,7 @@ public class ModelData
 /// <summary>
 /// url数据
 /// </summary>
+[Serializable]
 public class UrlData
 {
     public int id;
@@ -137,6 +143,7 @@ public class UrlData
 /// <summary>
 /// url请求参数
 /// </summary>
+[Serializable]
 public class UrlReqPara
 {
     public string para_name;
@@ -164,6 +171,7 @@ public class UrlReqPara
 /// <summary>
 /// url回复参数
 /// </summary>
+[Serializable]
 public class UrlResPara
 {
     public string para_name;
@@ -184,6 +192,7 @@ public class UrlResPara
 /// <summary>
 /// 参数数据类型
 /// </summary>
+[Serializable]
 public class DataType
 {
     public RangeType range_type;

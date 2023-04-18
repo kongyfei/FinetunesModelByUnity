@@ -19,7 +19,8 @@ public class PanelManager : MonoSingleton<PanelManager>
     private Dictionary<string, GameObject> panelPool;
 
     public Transform UIParent;
-    public string rootPath;
+    public string releasePath;
+    public string testPath;
 
     private List<PrefabAsset> prefabAssets;
 
@@ -59,8 +60,11 @@ public class PanelManager : MonoSingleton<PanelManager>
         }
         else if (curPanelAsset.type == PanelType.Popups)
         {
-            PanelBase hidePanel = panels.Peek();
-            hidePanel.GetComponent<CanvasGroup>().blocksRaycasts = false;
+            if (panels.Count > 0)
+            {
+                PanelBase hidePanel = panels.Peek();
+                hidePanel.GetComponent<CanvasGroup>().blocksRaycasts = false;
+            }
         }
 
         int popCount = 0;
@@ -93,7 +97,7 @@ public class PanelManager : MonoSingleton<PanelManager>
             GameObject prefab;
             if (!prefabPool.ContainsKey(typeName))
             {
-                string prefabPath = rootPath + typeName;
+                string prefabPath = releasePath + curPanelAsset.path;
                 prefab = Resources.Load(prefabPath) as GameObject;
                 prefabPool.Add(typeName, prefab);
             }

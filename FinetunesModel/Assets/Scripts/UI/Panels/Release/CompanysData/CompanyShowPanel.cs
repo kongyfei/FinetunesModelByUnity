@@ -13,7 +13,7 @@ public class CompanyShowPanel : PanelBase
 
 
     [Header("¹ö¶¯ÁÐ±í")]
-    public LoopVerticalScrollRect scrollRect;
+    public LoopHorizonalScrollRect scrollRect;
     public GameObject entryPrefab;
     public List<CompanyEntryData> companyDatas;
 
@@ -34,7 +34,7 @@ public class CompanyShowPanel : PanelBase
     {
         base.OnShow();
 
-
+        scrollRect.UpdateData(companyDatas.Count);
     }
 
     public override void OnHide()

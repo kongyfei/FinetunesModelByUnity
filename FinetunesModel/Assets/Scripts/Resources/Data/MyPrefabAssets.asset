@@ -14,16 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myPrefabAssets:
   - name: TestPanel
+    path: TestPanel
     type: 0
   - name: TestPanel1
+    path: TestPanel1
     type: 0
   - name: TestPanel2
+    path: TestPanel2
     type: 0
   - name: TestPanel3
+    path: TestPanel3
     type: 1
   - name: TestPanel4
+    path: TestPanel4
     type: 1
   - name: CompanyShowPanel
+    path: CompanysPanel/CompanyShowPanel
     type: 0
   - name: LoadingPanel
+    path: CommonPanel/LoadingPanel
     type: 1
