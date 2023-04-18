@@ -464,5 +464,6 @@ MonoBehaviour:
   state: 0
   frequency: 0
   name: 
+  main: 1
   scrollRect: {fileID: 1679192711669194590}
   entryPrefab: {fileID: 1339284037413043826, guid: b814ff31d683c564babd09d94f883d26, type: 3}

@@ -37,6 +37,7 @@ public class CompanyShowPanel : PanelBase
         scrollRect.UpdateData(companyDatas.Count);
     }
 
+
     public override void OnHide()
     {
         base.OnHide();

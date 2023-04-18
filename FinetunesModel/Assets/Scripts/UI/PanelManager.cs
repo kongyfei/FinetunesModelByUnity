@@ -124,15 +124,22 @@ public class PanelManager : MonoSingleton<PanelManager>
         PanelBase curPanel = panels.Peek();
         if (curPanel.gameObject.name == panelBase.gameObject.name)
         {
-            panelBase.OnHide();
-            panels.Pop();
-            Destroy(panelBase.gameObject);
-
-            if (panels.Count > 0)
+            if (!curPanel.main)
             {
-                PanelBase showPanel = panels.Peek();
-                showPanel.gameObject.SetActive(true);
-                showPanel.GetComponent<CanvasGroup>().blocksRaycasts = true;
+                panelBase.OnHide();
+                panels.Pop();
+                Destroy(panelBase.gameObject);
+
+                if (panels.Count > 0)
+                {
+                    PanelBase showPanel = panels.Peek();
+                    showPanel.gameObject.SetActive(true);
+                    showPanel.GetComponent<CanvasGroup>().blocksRaycasts = true;
+                }
+            }
+            else
+            {
+                LogExtension.LogFail("主界面无法退出");
             }
         }
         else

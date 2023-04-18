@@ -7,6 +7,22 @@ public class CompanyEntry : LoopEntry
 {
     public Image companyIcon;
     public Text companyName;
+    public Button jumpBtn;
+
+    private void OnEnable()
+    {
+        jumpBtn.onClick.AddListener(JumpPanel);
+    }
+
+    private void OnDisable()
+    {
+        jumpBtn.onClick.RemoveListener(JumpPanel);
+    }
+
+    private void JumpPanel()
+    {
+        
+    }
 
     public void Refresh(CompanyEntryData data)
     {
