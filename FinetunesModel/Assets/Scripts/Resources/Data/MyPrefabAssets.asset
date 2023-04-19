@@ -34,3 +34,6 @@ MonoBehaviour:
   - name: LoadingPanel
     path: CommonPanel/LoadingPanel
     type: 1
+  - name: ModelAndFilePanel
+    path: ModelAndFilePanel/ModelAndFilePanel
+    type: 0

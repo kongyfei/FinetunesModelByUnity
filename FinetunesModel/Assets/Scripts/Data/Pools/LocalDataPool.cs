@@ -31,6 +31,7 @@ public class LocalDataPool : DataPoolBase
 
     public Dictionary<string, string> token;
     public List<CompanyEntryData> companyEntryDatas;
+    public CompanyEntryData companyEntryData;
 
     public override void Init()
     {
@@ -49,5 +50,10 @@ public class LocalDataPool : DataPoolBase
         {
             companyEntryDatas.Add(new CompanyEntryData(companyDatas[i].name));
         }
+    }
+
+    public void SetCurCompanyEntryData(CompanyEntryData data)
+    {
+        companyEntryData = data;
     }
 }
