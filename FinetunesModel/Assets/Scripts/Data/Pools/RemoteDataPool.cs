@@ -28,7 +28,7 @@ public class RemoteDataPool : DataPoolBase
         }
     }
 
-    public CompanyDataList companys;
+    public List<CompanyData> companys;
 
     public override void Init()
     {
@@ -45,28 +45,26 @@ public class RemoteDataPool : DataPoolBase
     /// </summary>
     public void LoadCompanyData(Action onComplete)
     {
-        PanelManager.Instance.ShowLoading();
         LocalUrlData data = LocalUrlDataPool.Instance.GetLocalUrlDataById(1);
         MyNet.instance.AddNode(data, (result) => {
             OnLoadCompanyDataSuccess(result);
-            PanelManager.Instance.HideLoading();
             onComplete();
         });
     }
 
     public void OnLoadCompanyDataSuccess(SuccessResult result)
     {
-        companys = MyConvert.ToText<CompanyDataList>(result);
+        companys = MyConvert.ToText<List<CompanyData>>(result);
         LocalDataPool.Instance.ToCompanyEntryData(companys);
     }
 
     public CompanyData GetCompanyData(string name)
     {
-        for (int i = 0; i < companys.companys.Count; i++)
+        for (int i = 0; i < companys.Count; i++)
         {
-            if (companys.companys[i].name == name)
+            if (companys[i].name == name)
             {
-                return companys.companys[i];
+                return companys[i];
             }
         }
         LogExtension.LogFail($"不存在{name}公司");
@@ -76,14 +74,12 @@ public class RemoteDataPool : DataPoolBase
     /// <summary>
     /// 加载公司Url信息
     /// </summary>
-    public void LoadCompanyUrlData(string companyName, Action onComplete)
+    public void LoadCompanyUrlMessage(string companyName, Action onComplete)
     {
-        PanelManager.Instance.ShowLoading();
         LocalUrlData data = LocalUrlDataPool.Instance.GetLocalUrlDataById(3);
         data.SetData("company_name", null, companyName);
         MyNet.instance.AddNode(data, (result) => {
             OnLoadCompanyUrlDataSuccess(companyName, result);
-            PanelManager.Instance.HideLoading();
             onComplete();
         });
     }
@@ -91,7 +87,7 @@ public class RemoteDataPool : DataPoolBase
     public void OnLoadCompanyUrlDataSuccess(string name, SuccessResult result)
     {
         CompanyData companyData = GetCompanyData(name);
-        //companyData.modelDatas = MyConvert.ToText<>(result);
+        companyData.urlMessages = MyConvert.ToText<List<UrlMessage>>(result);
     }
 
     /// <summary>
@@ -99,12 +95,10 @@ public class RemoteDataPool : DataPoolBase
     /// </summary>
     public void LoadModelData(string companyName,Action onComplete)
     {
-        PanelManager.Instance.ShowLoading();
         LocalUrlData data = LocalUrlDataPool.Instance.GetLocalUrlDataById(2);
         data.SetData("company_name", null, companyName);
         MyNet.instance.AddNode(data, (result) => {
             OnLoadModelDataSuccess(companyName, result);
-            PanelManager.Instance.HideLoading();
             onComplete();
         });
     }
@@ -114,4 +108,73 @@ public class RemoteDataPool : DataPoolBase
         CompanyData companyData = GetCompanyData(name);
         companyData.modelDatas = MyConvert.ToText<List<ModelData>>(result);
     }
+
+    /// <summary>
+    /// 加载URL数据
+    /// </summary>
+    public void LoadUrlData(string companyName, string urlId, Action onComplete)
+    {
+        LocalUrlData data = LocalUrlDataPool.Instance.GetLocalUrlDataById(4);
+        data.SetData("company_name", null, companyName);
+        data.SetData("url_id", null, urlId);
+        MyNet.instance.AddNode(data, (result) => {
+            OnLoadUrlDataSuccess(companyName, result);
+            onComplete();
+        });
+    }
+
+    public void OnLoadUrlDataSuccess(string companyName, SuccessResult result)
+    {
+        CompanyData companyData = GetCompanyData(companyName);
+        UrlData urlData = MyConvert.ToText<UrlData>(result);
+        if (!companyData.urlData.Contains(urlData))
+        {
+            companyData.urlData.Add(urlData);
+        }
+        else
+        {
+            LogExtension.LogFail($"已存在{urlData.url}数据");
+        }
+    }
+
+    /// <summary>
+    /// 获取该公司的微调事件列表
+    /// </summary>
+    /// <param name="companyName">公司名</param>
+    public void GetFinetuneEventList(string companyName)
+    {
+        UrlData data = GetUrlData(companyName, UrlType.SHOW_FINETUNE_EVENTS.ToString());
+    }
+
+    public UrlData GetUrlData(string company, string function)
+    {
+        CompanyData companyData = GetCompanyData(company);
+        if (companyData != null)
+        {
+            for (int i = 0; i < companyData.urlMessages.Count; i++)
+            {
+                if (function == companyData.urlMessages[i].funtion)
+                {
+                    int id = companyData.urlMessages[i].id;
+                    for (int l = 0; l < companyData.urlData.Count; l++)
+                    {
+                        if (companyData.urlData[l].id == id)
+                        {
+                            return companyData.urlData[l];
+                        }
+                    }
+                    LogExtension.LogFail($"{company}不存在{id}的url数据");
+                    return null;
+                }
+            }
+            LogExtension.LogFail($"{company}不存在{function}的url数据");
+            return null;
+        }
+        return null;
+    }
+}
+
+public enum UrlType
+{
+    SHOW_FINETUNE_EVENTS,
 }

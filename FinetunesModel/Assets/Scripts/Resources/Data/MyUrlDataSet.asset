@@ -51,6 +51,6 @@ MonoBehaviour:
       datas:
       - key: company_name
         value: 
-      - key: url_name
+      - key: url_id
         value: 
       type: json

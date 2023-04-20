@@ -6,5 +6,5 @@ using UnityEngine;
 public class TestData : ScriptableObject
 {
     [SerializeField]
-    public CompanyDataList companys;
+    public List<CompanyData> companys;
 }

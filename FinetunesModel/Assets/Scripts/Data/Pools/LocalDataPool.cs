@@ -51,12 +51,11 @@ public class LocalDataPool : DataPoolBase
 
     }
 
-    public void ToCompanyEntryData(CompanyDataList list)
+    public void ToCompanyEntryData(List<CompanyData> list)
     {
-        List<CompanyData> companyDatas = list.companys;
-        for (int i = 0; i < companyDatas.Count; i++)
+        for (int i = 0; i < list.Count; i++)
         {
-            companyEntryDatas.Add(new CompanyEntryData(companyDatas[i].name));
+            companyEntryDatas.Add(new CompanyEntryData(list[i].name));
         }
     }
 

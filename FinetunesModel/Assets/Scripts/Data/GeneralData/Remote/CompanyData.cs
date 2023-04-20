@@ -15,8 +15,8 @@ public class CompanyData
     public CompanyMessageData companyMessageData;
 
     public List<ModelData> modelDatas;
-    public Dictionary<string, string> urls;
-    public UrlData urlData;
+    public List<UrlMessage> urlMessages;
+    public List<UrlData> urlData;
 
     public override string ToString()
     {
@@ -35,12 +35,12 @@ public class CompanyData
                 result += modelData.ToString() + "\n";
             }
         }
-        result += "URLs:\n";
-        if (urls != null)
+        result += "URL Messages:\n";
+        if (urlMessages != null)
         {
-            foreach (KeyValuePair<string, string> url in urls)
+            foreach (var url in urlMessages)
             {
-                result += url.Key + ": " + url.Value + "\n";
+                result += url.ToString();
             }
         }
         result += "URL Data:\n";
@@ -51,20 +51,6 @@ public class CompanyData
         return result;
     }
 
-}
-
-/// <summary>
-/// 公司数据列表
-/// </summary>
-[Serializable]
-public class CompanyDataList
-{
-    public List<CompanyData> companys;
-
-    public CompanyDataList()
-    {
-        companys = new List<CompanyData>();
-    }
 }
 
 /// <summary>
@@ -98,6 +84,21 @@ public class ModelData
         result += "Training Price: " + train_price + "\n";
         result += "Usage Price: " + use_price + "\n";
         return result;
+    }
+}
+
+/// <summary>
+/// Url信息
+/// </summary>
+public class UrlMessage
+{
+    public int id;
+    public string funtion;
+    public string url;
+
+    public override string ToString()
+    {
+        return $"Id: {id}, Function: {funtion}, URL: {url}";
     }
 }
 
@@ -137,6 +138,23 @@ public class UrlData
             }
         }
         return result;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+        {
+            return false;
+        }
+
+        UrlData other = (UrlData)obj;
+
+        if (id != other.id)
+        {
+            return false;
+        }
+
+        return true;
     }
 }
 
