@@ -33,7 +33,7 @@ MonoBehaviour:
         value: 
       type: json
   - id: 3
-    url: getParams
+    url: getUrls
     method: POST
     heads: []
     fields: []

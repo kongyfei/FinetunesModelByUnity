@@ -29,9 +29,17 @@ public class LocalDataPool : DataPoolBase
         }
     }
 
+    //各ai平台访问token
     public Dictionary<string, string> token;
+
+
+
+
+    //公司数据
     public List<CompanyEntryData> companyEntryDatas;
     public CompanyEntryData companyEntryData;
+    //模型数据
+    public List<ModelEntryData> modelEntryDatas;
 
     public override void Init()
     {

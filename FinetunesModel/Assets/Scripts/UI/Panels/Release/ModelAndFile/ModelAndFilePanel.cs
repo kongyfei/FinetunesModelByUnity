@@ -9,9 +9,23 @@ using UnityEngine.UI;
 public class ModelAndFilePanel : PanelBase
 {
     public Button close;
+    public LoopVerticalScrollRect scrollRect;
+    public GameObject modelEntry;
+    public MyDropDown modelDropDown;
+    public Button addModel;
+
+    public List<ModelEntryData> modelEntryDatas;
+
     public override void OnInit()
     {
         base.OnInit();
+
+        scrollRect.Init(4, modelEntry);
+
+        for (int i = 0; i < scrollRect.EntryList.Count; i++)
+        {
+            scrollRect.EntryList[i].OnIndexChanged = RefreshItem;
+        }
     }
 
     private void OnEnable()
@@ -27,6 +41,14 @@ public class ModelAndFilePanel : PanelBase
     public override void OnShow()
     {
         base.OnShow();
+
+        scrollRect.UpdateData(modelEntryDatas.Count);
+    }
+
+    private void RefreshItem(LoopEntry entry, int index)
+    {
+        ModelEntry tempEntry = entry as ModelEntry;
+        tempEntry.Refresh(modelEntryDatas[index]);
     }
 
     public override void OnHide()
