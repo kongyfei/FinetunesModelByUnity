@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using LocalData;
 
 /// <summary>
 /// 公司信息数据
@@ -156,6 +157,17 @@ public class UrlData
 
         return true;
     }
+
+    /// <summary>
+    /// 转换成LocalUrlData
+    /// </summary>
+    /// <returns>LocalUrlData</returns>
+    //public LocalUrlData ToLocalUrlData(params object[] paras)
+    //{
+    //    LocalUrlData localUrlData = new LocalUrlData();
+    //    localUrlData.SetUrl(paras);
+    //    localUrlData.method = method;
+    //}
 }
 
 /// <summary>

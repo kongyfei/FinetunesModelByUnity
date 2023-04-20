@@ -197,7 +197,7 @@ public class MyNet : MonoBehaviour
         {
             yield return new WaitForSeconds(delayTime);
             TestData list = Resources.Load<TestData>("Data/RemoteTestData");
-            CompanyDataList companys = list.companys;
+            List<CompanyData> companys = list.companys;
             SuccessResult result = new SuccessResult(1, SuccessResultType.Text, JsonMapper.ToJson(companys));
             successHandle(result);
         }

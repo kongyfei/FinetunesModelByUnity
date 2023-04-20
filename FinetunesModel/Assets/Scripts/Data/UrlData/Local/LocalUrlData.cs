@@ -35,11 +35,28 @@ namespace LocalData
         [SerializeField]
         public UrlDatas datas;
 
+        public LocalUrlData()
+        {
+
+        }
+
         public LocalUrlData(int size1, int size2, int size3)
         {
             heads = new List<UrlHead>(size1);
             fields = new List<UrlField>(size2);
             datas = new UrlDatas(size3);
+        }
+
+        /// <summary>
+        /// …Ë÷√url
+        /// </summary>
+        /// <param name="values">÷µ</param>
+        public void SetUrl(params object[] values)
+        {
+            if (values.Length > 0)
+            {
+                url = SetFormat(url, values);
+            }
         }
 
         /// <summary>
